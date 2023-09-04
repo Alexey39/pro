@@ -430,12 +430,16 @@
                                                             <th>Телефон</th>
                                                             <th>График работы</th>
                                                             <th>Статус</th>
-                                                            <th>Удалить</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="apteki_table">
+                                                        
                                                     </tbody>
-                                                </table>
+                                                </table><div id="table-container"></div>
+                                                <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+                                                
+                                                <input type="file" id="excel-file" />
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -500,7 +504,7 @@
     <!-- BACK-TO-TOP -->
     <a href="#top" id="back-to-top"><i class="fa fa-long-arrow-up"></i></a>
 
-    <script src="../assets/js/table-apteki.js"></script>
+
 
 
     <!-- JQUERY JS -->
@@ -551,5 +555,45 @@
     <script src="../assets/js/custom.js"></script>
 
 </body>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    table, th, td {
+        border: 1px solid black;
+    }
+    
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+    </style>
+<script>
+    document.getElementById('excel-file').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
 
+        reader.onload = function(e) {
+            var data = new Uint8Array(e.target.result);
+            var workbook = XLSX.read(data, { type: 'array' });
+            var sheet = workbook.Sheets[workbook.SheetNames[0]];
+            var jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            var html = '<table>';
+            jsonData.forEach(function(row) {
+                html += '<tr>';
+                row.forEach(function(cell) {
+                    html += '<td>' + cell + '</td>';
+                })
+                html += '</tr>';
+            });
+            html += '</table>';
+            document.getElementById('apteki_table').innerHTML = html;
+        }
+
+        reader.readAsArrayBuffer(file);
+    });
+</script>
 </html>
